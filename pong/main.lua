@@ -22,6 +22,9 @@ PADDLE_SPEED = 200
 function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
 
+  -- set the title of window
+  love.window.setTitle('CS50 Pong')
+
   -- "seed" the RNG so that calls to random are always random
   -- use the current time, since that will vary on startup every time
   math.randomseed(os.time())
@@ -130,5 +133,14 @@ function love.draw()
   --render the ball
   ball:render()
 
+  -- function to show FPS in LOVE2D
+  displayFPS()
+
   push:apply('end')
+end
+
+function displayFPS()
+  love.graphics.setFont(smallFont)
+  love.graphics.setColor(0, 255, 0, 255)
+  love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
 end
