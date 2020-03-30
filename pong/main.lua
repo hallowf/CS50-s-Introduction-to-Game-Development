@@ -43,6 +43,9 @@ function love.load()
   player1Score = 0
   player2Score = 0
 
+  -- wither 1 or 2, whoever scored gets to serve on the following turn
+  servingPlayer = 1
+
   -- initialize player paddles, make them global so ther can be detected
   -- by other functions and modules
   player1 = Paddle(10, 30, 5, 20)
@@ -57,7 +60,16 @@ function love.load()
 end
 
 function love.update(dt)
-  if gameState == 'play' then
+  if gameState == 'serve' then
+    -- before switching to play initialize the ball's velocity
+    -- based on the player who last scored
+    ball.dy  = math.random(-50,  50)
+    if servingPlayer == 1 then
+      ball.dx = math.random(140, 200)
+    else
+      ball.dx = -math.random(140, 200)
+    end
+  elseif gameState == 'play' then
     -- detect ball colision with paddle, reversing dx if true and
     -- slightly increasing it, then altering the dy based on the position
     if ball:collides(player1) then
@@ -99,14 +111,14 @@ function love.update(dt)
     servingPlayer = 1
     player2Score = player2Score + 1
     ball:reset()
-    gameState = 'start'
+    gameState = 'serve'
   end
 
   if ball.x > VIRTUAL_WIDTH then
     servingPlayer = 2
     player1Score = player1Score + 1
     ball:reset()
-    gameState = 'start'
+    gameState = 'serve'
   end
 
   -- player 1 movement
@@ -142,11 +154,9 @@ function love.keypressed(key)
     love.event.quit()
   elseif key == 'enter' or key == 'return' then
     if gameState == 'start' then
+      gameState = 'serve'
+    elseif gameState == 'serve' then
       gameState = 'play'
-    else
-      gameState = 'start'
-
-      ball:reset()
     end
   end
 end
@@ -159,6 +169,8 @@ function love.draw()
   -- Dividing everything by 255 makes that clean ratio
   love.graphics.clear(40/255, 45/255, 52/255, 1)
 
+  displayScore()
+
   if gameState == 'start' then
     love.graphics.setFont(smallFont)
     love.graphics.printf(
@@ -168,15 +180,14 @@ function love.draw()
       VIRTUAL_WIDTH, -- number of pixels to center within
       'center' -- alignment mode, can be 'center', 'left' or 'right'
     )
+  elseif gameState == 'serve' then
+    love.graphics.setFont(smallFont)
+    love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve",
+      0, 10, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
   end
 
-  -- draw score on the left and right center of screen
-  -- need to switch font before displaying
-  love.graphics.setFont(scoreFont)
-  love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50,
-    VIRTUAL_HEIGHT / 3)
-  love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30,
-    VIRTUAL_HEIGHT / 3)
+  
 
   -- render paddle, now using class's render method
   player1:render()
@@ -195,4 +206,14 @@ function displayFPS()
   love.graphics.setFont(smallFont)
   love.graphics.setColor(0, 1, 0, 1)
   love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
+end
+
+function displayScore()
+  -- draw score on the left and right center of screen
+  -- need to switch font before displaying
+  love.graphics.setFont(scoreFont)
+  love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50,
+    VIRTUAL_HEIGHT / 3)
+  love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30,
+    VIRTUAL_HEIGHT / 3)
 end
