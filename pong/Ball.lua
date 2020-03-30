@@ -25,6 +25,24 @@ function Ball:reset()
   self.dx = math.random(-50, 50)
 end
 
+function Ball:collides(paddle)
+  -- first check to see if the left edge of either is farther to the right
+  -- than the right edge of the other
+  if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width then
+    return false
+  end
+
+  -- then check to see if the bottom edge of either is  than the top
+  -- edge of the other
+  if self.y > paddle.y + paddle.height  or paddle.y > self.y + self.height then
+    return false
+  end
+
+  -- if the above aren't true they're overlapping
+  return true
+
+end
+
 --[[
   Simply applies velocity to position, scaled by deltaTime
 ]]
