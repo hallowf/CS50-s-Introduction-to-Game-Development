@@ -1,6 +1,6 @@
 Pipe = Class{}
 
-local PIPE_IMAGE = love.graphics.newImage('pipe.png')
+local PIPE_IMAGE = love.graphics.newImage('assets/sprites/pipe.png')
 
 PIPE_SPEED = 60
 
@@ -16,7 +16,7 @@ function Pipe:init(orientation, y)
 end
 
 function Pipe:update(dt)
-  
+
 end
 
 function Pipe:render()
