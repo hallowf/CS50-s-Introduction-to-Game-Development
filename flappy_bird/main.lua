@@ -37,8 +37,6 @@ local scrolling = true
 
 local paused = false
 
-local muted = false
-
 function love.load()
   love.graphics.setDefaultFilter('nearest', 'nearest')
 
@@ -93,9 +91,6 @@ function love.keypressed(key)
   if key == 'p' then
     paused = not paused
   end
-  if key == 'm' then
-    muted = not muted
-  end
 end
 
 function love.keyboard.wasPressed(key)
@@ -107,11 +102,13 @@ function love.keyboard.wasPressed(key)
 end
 
 function love.update(dt)
-  backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt)
-    % BACKGROUND_LOOPING_POINT
+  if not paused then
+    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt)
+      % BACKGROUND_LOOPING_POINT
 
-  groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt)
-    % VIRTUAL_WIDTH
+    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt)
+      % VIRTUAL_WIDTH
+  end
 
   gStateMachine:update(dt)
 

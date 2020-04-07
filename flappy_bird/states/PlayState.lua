@@ -12,6 +12,7 @@ function PlayState:init()
   self.pipePairs = {}
   self.timer = 0
   self.chosen_pause = math.random(2, 4)
+  self.paused = false
 
   self.score = 0
 
@@ -19,61 +20,69 @@ function PlayState:init()
 end
 
 function PlayState:update(dt)
-  self.timer = self.timer + dt
-
-  if self.timer > self.chosen_pause then
-    local y = math.max(-PIPE_HEIGHT + 10, 
-      math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
-    self.lastY = y
-
-    table.insert(self.pipePairs, PipePair(y))
-
-    self.chosen_pause = math.random(2, 4)
-    self.timer = 0
+  if love.keyboard.wasPressed('p') then
+    self.paused = not self.paused
   end
+  if not self.paused then
+    self.timer = self.timer + dt
 
-  for k, pair in pairs(self.pipePairs) do
+    if self.timer > self.chosen_pause then
+      local y = math.max(-PIPE_HEIGHT + 10, 
+        math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
+      self.lastY = y
 
-    if not pair.scored then
-      if pair.x + PIPE_WIDTH < self.bird.x then
-        self.score = self.score + 1
-        pair.scored = true
-        sounds['score']:play()
+      table.insert(self.pipePairs, PipePair(y))
+
+      self.chosen_pause = math.random(2, 4)
+      self.timer = 0
+    end
+
+    for k, pair in pairs(self.pipePairs) do
+
+      if not pair.scored then
+        if pair.x + PIPE_WIDTH < self.bird.x then
+          self.score = self.score + 1
+          pair.scored = true
+          sounds['score']:play()
+        end
+      end
+
+      pair:update(dt)
+    end
+
+    for k, pair in pairs(self.pipePairs) do
+      if pair.remove then
+        table.remove(self.pipePairs, k)
       end
     end
 
-    pair:update(dt)
-  end
+    self.bird:update(dt)
 
-  for k, pair in pairs(self.pipePairs) do
-    if pair.remove then
-      table.remove(self.pipePairs, k)
-    end
-  end
-
-  self.bird:update(dt)
-
-  for k, pair in pairs(self.pipePairs) do
-    for l, pipe in pairs(pair.pipes) do
-      if self.bird:collides(pipe) then
-        sounds['explosion']:play()
-        sounds['hurt']:play()
-        gStateMachine:change('score', {
-          score = self.score})
+    for k, pair in pairs(self.pipePairs) do
+      for l, pipe in pairs(pair.pipes) do
+        if self.bird:collides(pipe) then
+          sounds['explosion']:play()
+          sounds['hurt']:play()
+          gStateMachine:change('score', {
+            score = self.score})
+        end
       end
     end
-  end
 
-  if self.bird.y > VIRTUAL_HEIGHT - 15 then
-    sounds['explosion']:play()
-    sounds['hurt']:play()
-    gStateMachine:change('score', {
-      score = self.score
-    })
+    if self.bird.y > VIRTUAL_HEIGHT - 15 then
+      sounds['explosion']:play()
+      sounds['hurt']:play()
+      gStateMachine:change('score', {
+        score = self.score
+      })
+    end
   end
 end
 
 function PlayState:render()
+  if self.paused then
+    love.graphics.printf('Paused!', 0, 50, VIRTUAL_WIDTH, 'center')
+  end
   for k, pair in pairs(self.pipePairs) do
     pair:render()
   end
