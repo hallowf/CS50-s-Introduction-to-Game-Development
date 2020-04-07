@@ -11,6 +11,7 @@ function PlayState:init()
   self.bird = Bird()
   self.pipePairs = {}
   self.timer = 0
+  self.chosen_pause = math.random(2, 4)
 
   self.score = 0
 
@@ -20,13 +21,14 @@ end
 function PlayState:update(dt)
   self.timer = self.timer + dt
 
-  if self.timer > 2 then
+  if self.timer > self.chosen_pause then
     local y = math.max(-PIPE_HEIGHT + 10, 
       math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
     self.lastY = y
 
     table.insert(self.pipePairs, PipePair(y))
 
+    self.chosen_pause = math.random(2, 4)
     self.timer = 0
   end
 
