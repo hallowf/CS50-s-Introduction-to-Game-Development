@@ -68,6 +68,8 @@ function love.load()
   -- game state variable used to transition between different parts of the game
   -- used for beggining, menus, main game, high score, etc.
   gameState = 'start'
+
+  ai_enabled = true
 end
 
 function love.resize(w, h)
@@ -156,12 +158,16 @@ function love.update(dt)
   end
 
   -- player 1 movement
-  if love.keyboard.isDown('w') then
-    player1.dy = -PADDLE_SPEED
-  elseif love.keyboard.isDown('s') then
-    player1.dy = PADDLE_SPEED
+  if ai_enabled then
+    player1.y = ball.y
   else
-    player1.dy = 0
+    if love.keyboard.isDown('w') then
+      player1.dy = -PADDLE_SPEED
+    elseif love.keyboard.isDown('s') then
+      player1.dy = PADDLE_SPEED
+    else
+      player1.dy = 0
+    end
   end
   
   -- player 2 movement
@@ -186,6 +192,8 @@ end
 function love.keypressed(key)
   if key == 'escape' then
     love.event.quit()
+  elseif key == 'a'  then
+    ai_enabled = not ai_enabled
   elseif key == 'enter' or key == 'return' then
     if gameState == 'start' then
       gameState = 'serve'
@@ -218,6 +226,10 @@ function love.draw()
   love.graphics.clear(40/255, 45/255, 52/255, 1)
 
   displayScore()
+
+  love.graphics.setFont(smallFont)
+  love.graphics.printf("Press A to enable/disable AI(left side)", 0, 40, VIRTUAL_WIDTH, 'center')
+  love.graphics.printf("AI enabled: " .. tostring(ai_enabled), 0, 55, VIRTUAL_WIDTH, 'center')
 
   if gameState == 'start' then
     love.graphics.setFont(smallFont)
