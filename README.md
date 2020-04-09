@@ -1,7 +1,7 @@
 # CS50-s-Introduction-to-Game-Development
 Learning game development
 
-## Building pong
+## Building the games
 
 ### Linux to windows
 
