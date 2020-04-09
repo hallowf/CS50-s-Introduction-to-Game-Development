@@ -4,3 +4,6 @@
 [submodule "CS50-Bird"]
 	path = CS50-Bird
 	url = git@github.com:hallowf/CS50-Bird.git
+[submodule "CS50-Breakout"]
+	path = CS50-Breakout
+	url = git@github.com:hallowf/CS50-Breakout.git
